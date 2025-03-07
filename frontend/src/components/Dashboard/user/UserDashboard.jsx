@@ -1,8 +1,19 @@
-// src/components/Dashboard/UserDashboard.js
-
 import React, { useEffect, useState, useContext } from 'react';
-import { fetchTickets, createTicket } from '../../api';
-import { AuthContext } from '../../context';
+import { fetchTickets, createTicket } from '../../../api';
+import { AuthContext } from '../../../context';
+import {
+  UserContainer,
+  UserTitle,
+  TicketForm,
+  FormInput,
+  FormTextarea,
+  SubmitButton,
+  TicketList,
+  TicketItem,
+  TicketTitle,
+  TicketDescription,
+  TicketStatus,
+} from './User.styles';
 
 const UserDashboard = () => {
   const { token } = useContext(AuthContext);
@@ -29,43 +40,41 @@ const UserDashboard = () => {
       await createTicket({ title, description }, token);
       setTitle('');
       setDescription('');
-      loadTickets(); // Refresh tickets after creation
+      loadTickets(); 
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl mb-4">Your Tickets</h2>
-      <form onSubmit={handleCreateTicket} className="mb-6">
-        <input
+    <UserContainer>
+      <UserTitle>Your Tickets</UserTitle>
+      <TicketForm onSubmit={handleCreateTicket}>
+        <FormInput
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="p-2 border rounded mb-2 w-full"
         />
-        <textarea
+        <FormTextarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-          className="p-2 border rounded mb-2 w-full"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">Create Ticket</button>
-      </form>
-      <ul>
-        {tickets.map(ticket => (
-          <li key={ticket._id} className="border p-2 mb-2">
-            <h3 className="font-bold">{ticket.title}</h3>
-            <p>{ticket.description}</p>
-            <p>Status: {ticket.status}</p>
-          </li>
+        <SubmitButton type="submit">Create Ticket</SubmitButton>
+      </TicketForm>
+      <TicketList>
+        {tickets.map((ticket) => (
+          <TicketItem key={ticket._id}>
+            <TicketTitle>{ticket.title}</TicketTitle>
+            <TicketDescription>{ticket.description}</TicketDescription>
+            <TicketStatus>Status: {ticket.status}</TicketStatus>
+          </TicketItem>
         ))}
-      </ul>
-    </div>
+      </TicketList>
+    </UserContainer>
   );
 };
 

@@ -1,8 +1,18 @@
-// src/components/Dashboard/AdminDashboard.js
-
 import React, { useEffect, useContext, useState } from 'react';
-import { fetchTickets, updateTicketStatus } from '../../api';
-import { AuthContext } from '../../context';
+import { fetchTickets, updateTicketStatus } from '../../../api';
+import { AuthContext } from '../../../context';
+import {
+  AdminContainer,
+  AdminTitle,
+  TicketList,
+  TicketItem,
+  TicketTitle,
+  TicketDescription,
+  TicketStatus,
+  StatusButton,
+  StatusOptions,
+  StatusOptionButton,
+} from './Admin.styles';
 
 const AdminDashboard = () => {
   const { token } = useContext(AuthContext);
@@ -23,7 +33,7 @@ const AdminDashboard = () => {
   }, [token]);
 
   const handleStatusChange = (id, newStatus) => {
-    const updatedTickets = tickets.map(ticket => {
+    const updatedTickets = tickets.map((ticket) => {
       if (ticket._id === id) {
         return { ...ticket, status: newStatus }; // Temporarily update the ticket's status for UI
       }
@@ -32,86 +42,85 @@ const AdminDashboard = () => {
     setTickets(updatedTickets);
 
     // Make API call to update the status in the backend
-    updateTicketStatus(id, newStatus, token).then(() => {
-      // Optionally reload tickets after status change
-      loadTickets();
-    }).catch(error => {
-      console.error(error);
-      // Optionally revert the ticket status in case of failure here
-    });
+    updateTicketStatus(id, newStatus, token)
+      .then(() => {
+        // Optionally reload tickets after status change
+        loadTickets();
+      })
+      .catch((error) => {
+        console.error(error);
+        // Optionally revert the ticket status in case of failure here
+      });
   };
 
   const toggleStatusOptions = (ticketId) => {
     // Toggle the visibility of the status options for the clicked ticket
-    setStatusOptions(prevOptions => ({
+    setStatusOptions((prevOptions) => ({
       ...prevOptions,
       [ticketId]: !prevOptions[ticketId], // Toggle true/false
     }));
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl mb-4">All Tickets</h2>
-      <ul>
-        {tickets.map(ticket => (
-          <li key={ticket._id} className="border p-2 mb-2">
-            <h3 className="font-bold">{ticket.title}</h3>
-            <p>{ticket.description}</p>
-            <p>Status: {ticket.status}</p>
-            <button 
-              onClick={() => toggleStatusOptions(ticket._id)} 
-              className="bg-blue-500 text-white p-1 rounded"
-            >
+    <AdminContainer>
+      <AdminTitle>All Tickets</AdminTitle>
+      <TicketList>
+        {tickets.map((ticket) => (
+          <TicketItem key={ticket._id}>
+            <TicketTitle>{ticket.title}</TicketTitle>
+            <TicketDescription>{ticket.description}</TicketDescription>
+            <TicketStatus>Status: {ticket.status}</TicketStatus>
+            <StatusButton onClick={() => toggleStatusOptions(ticket._id)}>
               Change Status
-            </button>
+            </StatusButton>
             {statusOptions[ticket._id] && ( // Render status options if toggle is true
-              <div className="mt-2">
+              <StatusOptions>
                 {ticket.status === 'Open' && (
                   <>
-                    <button
+                    <StatusOptionButton
+                      status="In Progress"
                       onClick={() => handleStatusChange(ticket._id, 'In Progress')}
-                      className="bg-yellow-500 text-white p-1 rounded mr-2"
                     >
                       In Progress
-                    </button>
-                    <button
+                    </StatusOptionButton>
+                    <StatusOptionButton
+                      status="Closed"
                       onClick={() => handleStatusChange(ticket._id, 'Closed')}
-                      className="bg-red-500 text-white p-1 rounded"
                     >
                       Closed
-                    </button>
+                    </StatusOptionButton>
                   </>
                 )}
                 {ticket.status === 'In Progress' && (
                   <>
-                    <button
+                    <StatusOptionButton
+                      status="Open"
                       onClick={() => handleStatusChange(ticket._id, 'Open')}
-                      className="bg-green-500 text-white p-1 rounded mr-2"
                     >
                       Open
-                    </button>
-                    <button
+                    </StatusOptionButton>
+                    <StatusOptionButton
+                      status="Closed"
                       onClick={() => handleStatusChange(ticket._id, 'Closed')}
-                      className="bg-red-500 text-white p-1 rounded"
                     >
                       Closed
-                    </button>
+                    </StatusOptionButton>
                   </>
                 )}
                 {ticket.status === 'Closed' && (
-                  <button
+                  <StatusOptionButton
+                    status="In Progress"
                     onClick={() => handleStatusChange(ticket._id, 'In Progress')}
-                    className="bg-yellow-500 text-white p-1 rounded"
                   >
                     Reopen
-                  </button>
+                  </StatusOptionButton>
                 )}
-              </div>
+              </StatusOptions>
             )}
-          </li>
+          </TicketItem>
         ))}
-      </ul>
-    </div>
+      </TicketList>
+    </AdminContainer>
   );
 };
 
