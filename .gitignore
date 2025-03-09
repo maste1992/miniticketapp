@@ -1,0 +1,10 @@
+# Ignore environment variables
+.env
+backend/.env
+
+# Ignore node modules
+node_modules/
+
+# Ignore logs and temporary files
+*.log
+.DS_Store
