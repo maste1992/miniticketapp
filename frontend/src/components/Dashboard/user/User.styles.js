@@ -1,5 +1,13 @@
 import styled from 'styled-components';
 
+// Header container (to hold the title and profile section)
+export const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
 // Container for the user dashboard
 export const UserContainer = styled.div`
   max-width: 1200px;
@@ -11,8 +19,49 @@ export const UserContainer = styled.div`
 export const UserTitle = styled.h2`
   font-size: 1.875rem; /* 30px */
   font-weight: bold;
-  margin-bottom: 1rem;
   color: #1e293b; /* Dark gray text */
+`;
+
+// Profile container
+export const ProfileContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
+// Profile name
+export const ProfileName = styled.span`
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1e293b; /* Dark gray text */
+  margin-right: 0.5rem;
+`;
+
+// Dropdown menu
+export const DropdownMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #d1d5db; /* Light gray border */
+  border-radius: 0.375rem; /* 6px */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  display: ${(props) => (props.isOpen ? 'block' : 'none')};
+`;
+
+// Dropdown item
+export const DropdownItem = styled.div`
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem; /* 14px */
+  color: #1e293b; /* Dark gray text */
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f3f4f6; /* Light gray background */
+  }
 `;
 
 // Form for creating a new ticket

@@ -33,6 +33,7 @@ exports.signup = async (req, res) => {
 
 
 // Login User
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -40,19 +41,42 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "1 day",
+      expiresIn: process.env.JWT_EXPIRES_IN || "1d",
     });
 
-    res.json({ message:"successfull login", token, user: { username: user.username, email: user.email, role: user.role } });
+    const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, {
+      expiresIn: "7d",
+    });
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Set token in a secure cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    // Send response
+    res.json({
+      message: "successfull login",
+      token,
+      refreshToken,
+      user: { username: user.username, email: user.email, role: user.role },
+    });
   } catch (err) {
+    console.error('Login error:', err.message);
     res.status(500).json({ message: "Server error", error: err.message });
   }
+};
+exports.logout = (req, res) => {
+  res.clearCookie('token'); // Clear the HTTP-only cookie
+  res.json({ message: "Logged out successfully" });
 };
 
 // Get all users

@@ -3,7 +3,12 @@ import { fetchTickets, createTicket } from '../../../api';
 import { AuthContext } from '../../../context';
 import {
   UserContainer,
+  Header,
   UserTitle,
+  ProfileContainer,
+  ProfileName,
+  DropdownMenu,
+  DropdownItem,
   TicketForm,
   FormInput,
   FormTextarea,
@@ -16,10 +21,11 @@ import {
 } from './User.styles';
 
 const UserDashboard = () => {
-  const { token } = useContext(AuthContext);
+  const { token, currentUser, logout } = useContext(AuthContext);
   const [tickets, setTickets] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
 
   const loadTickets = async () => {
     try {
@@ -40,15 +46,36 @@ const UserDashboard = () => {
       await createTicket({ title, description }, token);
       setTitle('');
       setDescription('');
-      loadTickets(); 
+      loadTickets(); // Refresh tickets after creation
     } catch (error) {
       console.error(error);
     }
   };
 
+  // Toggle dropdown visibility
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <UserContainer>
-      <UserTitle>Your Tickets</UserTitle>
+      {/* Header with title and profile section */}
+      <Header>
+        <UserTitle>Your Tickets</UserTitle>
+        <ProfileContainer onClick={toggleDropdown}>
+          <ProfileName>{currentUser?.username}</ProfileName>
+          <DropdownMenu isOpen={isDropdownOpen}>
+            <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
+          </DropdownMenu>
+        </ProfileContainer>
+      </Header>
+
+      {/* Ticket creation form */}
       <TicketForm onSubmit={handleCreateTicket}>
         <FormInput
           type="text"
@@ -65,6 +92,8 @@ const UserDashboard = () => {
         />
         <SubmitButton type="submit">Create Ticket</SubmitButton>
       </TicketForm>
+
+      {/* Ticket list */}
       <TicketList>
         {tickets.map((ticket) => (
           <TicketItem key={ticket._id}>

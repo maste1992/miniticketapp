@@ -1,6 +1,5 @@
 const Ticket =require('../models/Ticket')
 const jwt=require('jsonwebtoken');
-//creating tikcte and attach with usser id 
 
 exports.createTicket=[
     async(req,res)=>{
